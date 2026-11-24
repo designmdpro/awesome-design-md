@@ -1,0 +1,44 @@
+name: Lint
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 3 * * 1" # weekly link check, Mondays 03:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  awesome-lint:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npx --yes awesome-lint README.md
+
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check links in the list
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress --max-retries 3 --accept 200,429 README.md contributing.md
+          fail: false
+      - name: Open an issue for broken links
+        if: steps.lychee.outputs.exit_code != 0 && github.event_name == 'schedule'
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: Broken links found by the weekly check
+          content-filepath: ./lychee/out.md
+          labels: maintenance

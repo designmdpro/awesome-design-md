@@ -1,0 +1,27 @@
+name: Find new DESIGN.md projects
+
+on:
+  schedule:
+    - cron: "0 4 * * 1" # Mondays 04:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  scout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/find-candidates.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: New DESIGN.md projects to review
+          content-filepath: ./candidates.md
+          labels: candidates

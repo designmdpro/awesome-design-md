@@ -1,0 +1,49 @@
+name: Sync DESIGN.md files
+
+on:
+  schedule:
+    - cron: "0 2 * * 1" # Mondays 02:00 UTC (10:00 Singapore)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-designmdpro
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Pull free DESIGN.md files from DesignMD Pro
+        run: node scripts/sync-designmdpro.mjs
+
+      - name: Lint synced files with the reference CLI
+        continue-on-error: true
+        run: |
+          status=0
+          for f in design-md/*/DESIGN.md; do
+            npx --yes -p @google/design.md designmd lint "$f" > /dev/null || { echo "::warning file=$f::lint findings"; status=1; }
+          done
+          exit $status
+
+      # Opens or updates one pull request for review instead of pushing to main.
+      # Requires Settings > Actions > General > "Allow GitHub Actions to create
+      # and approve pull requests".
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          branch: bot/sync-designmdpro
+          commit-message: "Sync DESIGN.md files from DesignMD Pro"
+          title: "Weekly DESIGN.md sync"
+          body-path: sync-summary.md
+          add-paths: design-md/
+          delete-branch: true
+          labels: sync
