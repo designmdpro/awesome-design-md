@@ -63,7 +63,7 @@ Turn an existing website or design file into a DESIGN.md.
 - [oh-my-design](https://github.com/kwakseongjae/oh-my-design) - One command that installs graded DESIGN.md references and skills into Claude Code, Codex and Cursor.
 - [anydesign](https://github.com/uxKero/anydesign) - Claude skill that builds a DESIGN.md from screenshots, websites or Figma files.
 - [brand-to-design-md-skill](https://github.com/shaom/brand-to-design-md-skill) - Portable skill that turns a public brand URL into a source-aware DESIGN.md.
-- [DesignMD Pro MCP server](https://www.designmdpro.app/docs) - Streamable HTTP MCP server with `search_websites` and `get_design_md` tools. Maintained by the authors of this list.
+- [DesignMD Pro MCP server](https://www.designmdpro.app/integrations/mcp) - Streamable HTTP MCP server with `search_websites` and `get_design_md` tools, also listed in the [Claude connector directory](https://claude.ai/directory/designmdpro). Maintained by the authors of this list.
 
 ## Related Lists
 
